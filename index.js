@@ -15,11 +15,13 @@ async function run () {
 
   // Determine the pull request title.
   const title = process.env.INPUT_TITLE
+  logger.debug('Title', title)
   if (!title) throw new Error('No pull request title specified')
 
   // Determine the head branch.
   let head = process.env.INPUT_HEAD
   if (!head) head = slugify(title)
+  logger.debug('Head', head)
 
   // Determine the base branch.
   let base = process.env.INPUT_BASE
@@ -28,18 +30,22 @@ async function run () {
     const { data } = request('GET /repos/{owner}/{repo}', { owner, repo })
     base = data.default_branch
   }
+  logger.debug('Base', base)
 
   let pr
   try {
     // Try fetching the head branch from origin.
+    logger.debug('Fetch from origin')
     await execa('git', ['fetch', 'origin', head])
 
     // Search for an existing pull request if the head branch exists.
     const q = `head:${head} type:pr is:open repo:${owner}/${repo}`
     const { data } = await request('GET /search/issues', { q })
     pr = data.items?.length && data.items[0]
+    if (pr) logger.debug('Found existing PR', pr)
 
     // Check out the head branch.
+    logger.debug('Checkout existing branch', head)
     await execa('git', ['checkout', head])
   } catch (err) {
     // If an error was thrown, the branch doesn't exist, so create it.
@@ -55,6 +61,7 @@ async function run () {
   }
 
   // Push the branch to origin.
+  logger.debug('Push to origin', head)
   await execa('git', ['push', 'origin', head])
 
   const body = process.env.INPUT_BODY
@@ -63,9 +70,11 @@ async function run () {
     // Update the existing pull request and make sure it's open.
     payload.pull_number = pr.pull_number
     payload.state = 'open'
+    logger.debug('Update existing PR', payload)
     await request('PUT /repos/{owner}/{repo}/pulls/{pull_number}', payload)
   } else {
     // Create the pull request if it doesn't exist.
+    logger.debug('Create PR', payload)
     await request('POST /repos/{owner}/{repo}/pulls', payload)
   }
 }
