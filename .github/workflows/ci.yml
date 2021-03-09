@@ -1,0 +1,23 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: node:15-buster
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: yarn
+      - name: Lint
+        run: yarn lint --fix
+      - name: Commit Lint Fixes
+        uses: ./
+        with:
+          message: Lint fixes
