@@ -29,7 +29,7 @@
     "@actions/core": "^1.2.6",
     "@generates/logger": "0.1.2",
     "@octokit/request": "^5.4.14",
-    "execa": "^4.0.3",
+    "execa": "^5.0.0",
     "slugify": "^1.4.7"
   },
   "devDependencies": {
