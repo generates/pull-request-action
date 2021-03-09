@@ -21,7 +21,7 @@ async function run () {
 
   // Determine the head branch.
   let head = process.env.INPUT_HEAD
-  if (!head) head = slugify(title).toLowerCase()
+  if (!head) head = slugify(title)
   logger.debug('Head', head)
 
   // Determine the base branch.
@@ -29,7 +29,6 @@ async function run () {
   if (!base) {
     // If the base branch isn't specified, use the repo's default branch.
     const { data } = await request('GET /repos/{owner}/{repo}', { owner, repo })
-    logger.debug('Repo data', data)
     base = data.default_branch
   }
   logger.debug('Base', base)
@@ -59,8 +58,7 @@ async function run () {
   const commitParams = ['--yes', '@generates/commit-action']
   const { INPUT_COMMIT, INPUT_MESSAGE, INPUT_FILES } = process.env
   if (INPUT_COMMIT || INPUT_MESSAGE || INPUT_FILES) {
-    // TODO: change commit action to take INPUT_TOKEN
-    const env = { GITHUB_TOKEN: process.env.INPUT_TOKEN }
+    const env = { INPUT_BRANCH: head }
     await execa('npx', commitParams, { env })
   }
 
