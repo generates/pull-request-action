@@ -10,7 +10,7 @@ const logger = createLogger({ level: 'info', namespace: 'pull-request-action' })
 
 async function run () {
   const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
-  const headers = { authorization: `token ${process.env.GITHUB_TOKEN}` }
+  const headers = { authorization: `token ${process.env.INPUT_TOKEN}` }
   const request = octokit.request.defaults({ headers })
 
   // Determine the pull request title.

@@ -39,4 +39,6 @@ jobs:
         run: echo "Racks 2 Skinny" > commits/$(date +%s).txt
       - name: Create pull request
         uses: ./
+        with:
+          token: ${{ secrets.GH_PAT }}
 
