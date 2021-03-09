@@ -3,7 +3,7 @@
 const core = require('@actions/core')
 const { createLogger } = require('@generates/logger')
 const execa = require('execa')
-const slugify = require('slugify')
+const slugify = require('@sindresorhus/slugify')
 const octokit = require('@octokit/request')
 
 const logger = createLogger({ level: 'info', namespace: 'pull-request-action' })
