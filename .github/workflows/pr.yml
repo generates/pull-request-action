@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GH_PAT }}
+          persist-credentials: false
       - name: Make Change
         run: echo "Racks 2 Skinny" > commits/$(date +%s).txt
       - name: Create pull request
