@@ -49,4 +49,5 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.GH_PAT }}
+          title: ${{ github.event.inputs.title }}
 
