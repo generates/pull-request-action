@@ -12,6 +12,7 @@ async function run () {
   const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
   const headers = { authorization: `token ${process.env.INPUT_TOKEN}` }
   const request = octokit.request.defaults({ headers })
+  logger.debug('Repo', { owner, repo })
 
   // Determine the pull request title.
   const title = process.env.INPUT_TITLE
@@ -27,9 +28,9 @@ async function run () {
   let base = process.env.INPUT_BASE
   if (!base) {
     // If the base branch isn't specified, use the repo's default branch.
-    const { data } = request('GET /repos/{owner}/{repo}', { owner, repo })
-    logger.debug('Repo data', data)
-    base = data.default_branch
+    const response = request('GET /repos/{owner}/{repo}', { owner, repo })
+    logger.debug('Repo data', response)
+    base = response.default_branch
   }
   logger.debug('Base', base)
 
