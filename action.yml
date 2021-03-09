@@ -1,12 +1,18 @@
-name: Commit Action
-description: Automate git commits with GitHub Actions
+name: Pull Request Action
+description: Automate pull requests with GitHub Actions
 author: Ian Walter
 branding:
   icon: book
   color: blue
 inputs:
-  branch:
-    description: The git branch you want to commit to.
+  title:
+    description: The title of the pull request you want to create.
+    required: true
+  head:
+    description: The branch for the pull request you want to create.
+    required: false
+  base:
+    description: The branch you want to point the pull request to.
     required: false
   files:
     description: The changed files you want included in the commit.

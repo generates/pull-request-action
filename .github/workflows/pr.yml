@@ -1,9 +1,15 @@
-name: Commit
+name: PR
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: The git branch you want to commit to.
+      title:
+        description: The title of the pull request you want to create.
+        required: true
+      head:
+        description: The branch for the pull request you want to create.
+        required: false
+      base:
+        description: The branch you want to point the pull request to.
         required: false
       files:
         description: The changed files you want included in the commit.
@@ -18,20 +24,19 @@ on:
         description: The GitHub token to use to push the commit to GitHub.
         required: false
 jobs:
-  commit:
+  run:
+    name: Run
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      DEBUG: true
+      DEBUG: pull-request-action
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
-          persist-credentials: false
+          token: ${{ secrets.GH_PAT }}
       - name: Make Change
         run: echo "Racks 2 Skinny" > commits/$(date +%s).txt
-      - name: Commit Changes
+      - name: Create pull request
         uses: ./
-        with:
-          token: ${{ secrets.GH_PAT }}
+

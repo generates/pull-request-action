@@ -1,4 +1,4 @@
-# commit-action
+# pull-request-action
 
 ## 1.0.2
 

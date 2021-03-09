@@ -1,5 +1,5 @@
-# Commit Action
-> Automate git commits with GitHub Actions
+# Pull Request Action
+> Automate pull requests with GitHub Actions
 
 ## About
 
@@ -23,8 +23,11 @@ jobs:
           fetch-depth: 0
       - name: Make Changes
         uses: some-action
-      - name: Commit Changes
-        uses: generates/commit-action@v1.0.0
+      - name: Create Pull Requst
+        uses: generates/pull-request-action@v0.0.1
+        with:
+          title: These are days of miracle and wonder
+          message: A loose affiliation of millionaires and billionaires
 ```
 
 ## License
@@ -35,4 +38,4 @@ Hippocratic License - See [LICENSE][licenseUrl]
 
 Created by [Ian Walter](https://ianwalter.dev)
 
-[licenseUrl]: https://github.com/generates/commit-action/blob/main/LICENSE
+[licenseUrl]: https://github.com/generates/pull-request-action/blob/main/LICENSE

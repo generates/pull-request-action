@@ -1,11 +1,11 @@
 FROM node:15-buster
 
-RUN mkdir -p /opt/commit-action
+RUN mkdir -p /opt/pull-request-action
 
-COPY yarn.lock /opt/commit-action
-COPY package.json /opt/commit-action
-RUN cd /opt/commit-action && yarn && cd $HOME
+COPY yarn.lock /opt/pull-request-action
+COPY package.json /opt/pull-request-action
+RUN cd /opt/pull-request-action && yarn && cd $HOME
 
-COPY index.js /opt/commit-action
+COPY index.js /opt/pull-request-action
 
-CMD ["node", "/opt/commit-action"]
+CMD ["node", "/opt/pull-request-action"]

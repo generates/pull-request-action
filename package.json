@@ -1,21 +1,21 @@
 {
-  "name": "@generates/commit-action",
-  "version": "1.0.2",
-  "description": "Automate git commits with GitHub Actions",
+  "name": "@generates/pull-request-action",
+  "version": "0.0.0",
+  "description": "Automate pull requests with GitHub Actions",
   "main": "index.js",
   "bin": {
-    "commit": "index.js"
+    "pr": "index.js"
   },
   "scripts": {
     "lint": "eslint ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/generates/commit-action.git"
+    "url": "git+https://github.com/generates/pull-request-action.git"
   },
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/generates/commit-action/issues"
+    "url": "https://github.com/generates/pull-request-action/issues"
   },
   "funding": {
     "type": "github",
@@ -24,13 +24,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/generates/commit-action#readme",
+  "homepage": "https://github.com/generates/pull-request-action#readme",
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^4.0.0",
     "@generates/logger": "0.1.2",
-    "@ianwalter/dot": "^1.0.5",
-    "execa": "^4.0.3"
+    "@octokit/request": "^5.4.14",
+    "execa": "^4.0.3",
+    "slugify": "^1.4.7"
   },
   "devDependencies": {
     "@changesets/cli": "^2.14.1",

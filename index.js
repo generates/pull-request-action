@@ -1,64 +1,72 @@
 #!/usr/bin/env node
 
 const core = require('@actions/core')
-const github = require('@actions/github')
 const { createLogger } = require('@generates/logger')
-const dot = require('@ianwalter/dot')
 const execa = require('execa')
+const slugify = require('slugify')
+const octokit = require('@octokit/request')
 
-const logger = createLogger()
+const logger = createLogger({ level: 'info', namespace: 'pull-request-action' })
 
 async function run () {
-  // Commit to the branch specified in inputs.
-  let branch = process.env.INPUT_BRANCH
+  const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+  const headers = { authorization: `token ${process.env.GITHUB_TOKEN}` }
+  const request = octokit.request.defaults({ headers })
 
-  // If no branch was specified, try to set it to the PR branch.
-  if (!branch) branch = dot.get(github.context, 'payload.pull_request.head.ref')
+  // Determine the pull request title.
+  const title = process.env.INPUT_TITLE
+  if (!title) throw new Error('No pull request title specified')
 
-  // If this is not a PR, use the current branch.
-  if (!branch) branch = process.env.GITHUB_REF
+  // Determine the head branch.
+  let head = process.env.INPUT_HEAD
+  if (!head) head = slugify(title)
 
-  // Output the branch that will be used.
-  logger.info('Using branch:', branch)
+  // Determine the base branch.
+  let base = process.env.INPUT_BASE
+  if (!base) {
+    // If the base branch isn't specified, use the repo's default branch.
+    const { data } = request('GET /repos/{owner}/{repo}', { owner, repo })
+    base = data.default_branch
+  }
 
-  // TODO: check if branch exists and create it if necessary.
+  let pr
+  try {
+    // Try fetching the head branch from origin.
+    await execa('git', ['fetch', 'origin', head])
 
-  // Check if there are local changes.
-  const { stdout: hasChanges } = await execa('git', ['status', '--porcelain'])
-  if (hasChanges) {
-    // Add specified files or all changes.
-    const files = process.env.INPUT_FILES
-      ? process.env.INPUT_FILES.split('\n')
-      : '.'
-    await execa('git', ['add', files])
+    // Search for an existing pull request if the head branch exists.
+    const q = `head:${head} type:pr is:open repo:${owner}/${repo}`
+    const { data } = await request('GET /search/issues', { q })
+    pr = data.items?.length && data.items[0]
 
-    // Check if there are staged changes.
-    const args = ['diff', '--staged', '--name-only']
-    const { stdout: hasStaged } = await execa('git', args)
-    if (hasStaged) {
-      // Configure the git user.
-      const author = 'github-actions[bot]'
-      await execa('git', ['config', '--global', 'user.name', author])
-      const email = 'github-actions[bot]@users.noreply.github.com'
-      await execa('git', ['config', '--global', 'user.email', email])
+    // Check out the head branch.
+    await execa('git', ['checkout', head])
+  } catch (err) {
+    // If an error was thrown, the branch doesn't exist, so create it.
+    logger.debug('Failed to fetch branch from origin', err)
+    await execa('git', ['checkout', '-b', head])
+  }
 
-      // Commit the changes.
-      const message = process.env.INPUT_MESSAGE || 'Automated commit'
-      await execa('git', ['commit', '-m', message])
+  // Commit changed files if necessary.
+  const commitParams = ['--yes', '@generates/commit-action']
+  const { INPUT_COMMIT, INPUT_MESSAGE, INPUT_FILES } = process.env
+  if (INPUT_COMMIT || INPUT_MESSAGE || INPUT_FILES) {
+    await execa('npx', commitParams)
+  }
 
-      // Push the changes back to the branch.
-      const actor = process.env.INPUT_ACTOR || process.env.GITHUB_ACTOR
-      const token = process.env.INPUT_TOKEN
-      const repo = process.env.GITHUB_REPOSITORY
-      const origin = token
-        ? `https://${actor}:${token}@github.com/${repo}.git`
-        : 'origin'
-      await execa('git', ['push', origin, `HEAD:${branch}`])
-    } else {
-      logger.info('No staged files', { hasStaged })
-    }
+  // Push the branch to origin.
+  await execa('git', ['push', 'origin', head])
+
+  const body = process.env.INPUT_BODY
+  const payload = { owner, repo, title, body, head, base }
+  if (pr) {
+    // Update the existing pull request and make sure it's open.
+    payload.pull_number = pr.pull_number
+    payload.state = 'open'
+    await request('PUT /repos/{owner}/{repo}/pulls/{pull_number}', payload)
   } else {
-    logger.info('No local changes', { hasChanges })
+    // Create the pull request if it doesn't exist.
+    await request('POST /repos/{owner}/{repo}/pulls', payload)
   }
 }
 
