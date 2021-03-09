@@ -58,7 +58,8 @@ async function run () {
   const commitParams = ['--yes', '@generates/commit-action']
   const { INPUT_COMMIT, INPUT_MESSAGE, INPUT_FILES } = process.env
   if (INPUT_COMMIT || INPUT_MESSAGE || INPUT_FILES) {
-    const env = { INPUT_BRANCH: head }
+    const token = process.env.INPUT_ACTOR ? process.env.INPUT_TOKEN : undefined
+    const env = { INPUT_BRANCH: head, INPUT_TOKEN: token }
     await execa('npx', commitParams, { env })
   }
 
