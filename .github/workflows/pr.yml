@@ -3,33 +3,31 @@ on:
   workflow_dispatch:
     inputs:
       title:
-        description: The title of the pull request you want to create.
+        description: Pull request title
         required: true
       body:
-        description: The body of the pull request comment/description.
+        description: Pull request body
         required: false
       head:
-        description: The branch for the pull request you want to create.
+        description: Pull request head branch
         required: false
       base:
-        description: The branch you want to point the pull request to.
+        description: Pull request base branch
         required: false
       commit:
-        description: |
-          Whether to automatically stage and commit changed files before
-          creating the pull request.
+        description: Commit changes
         required: false
       files:
-        description: The changed files you want included in the commit.
+        description: Files to commit
         required: false
       message:
-        description: The commit message.
+        description: Commit message
         required: false
       actor:
-        description: Who to author the commit as.
+        description: Commit author
         required: false
       token:
-        description: The GitHub token to use to push the commit to GitHub.
+        description: GitHub token
         required: false
 jobs:
   run:

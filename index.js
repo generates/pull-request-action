@@ -20,7 +20,7 @@ async function run () {
 
   // Determine the head branch.
   let head = process.env.INPUT_HEAD
-  if (!head) head = slugify(title)
+  if (!head) head = slugify(title).toLowerCase()
   logger.debug('Head', head)
 
   // Determine the base branch.
@@ -28,6 +28,7 @@ async function run () {
   if (!base) {
     // If the base branch isn't specified, use the repo's default branch.
     const { data } = request('GET /repos/{owner}/{repo}', { owner, repo })
+    logger.debug('Repo data', data)
     base = data.default_branch
   }
   logger.debug('Base', base)
