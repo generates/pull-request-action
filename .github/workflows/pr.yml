@@ -16,8 +16,8 @@ on:
         required: false
       commit:
         description: |
-          Whether to automatically stage and commit changed files before creating
-          the pull request.
+          Whether to automatically stage and commit changed files before
+          creating the pull request.
         required: false
       files:
         description: The changed files you want included in the commit.
@@ -50,4 +50,5 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           title: ${{ github.event.inputs.title }}
+          commit: ${{ github.event.inputs.commit }}
 
