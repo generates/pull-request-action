@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/generates/pull-request-action#readme",
   "dependencies": {
-    "@actions/core": "^1.2.6",
+    "@actions/core": "^1.2.7",
     "@generates/logger": "0.1.2",
     "@octokit/request": "^5.4.14",
     "@sindresorhus/slugify": "^1.1.0",
